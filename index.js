@@ -4,6 +4,7 @@ app.get('/', (req, res) => {
    res.send("Node Server is running bitches")
 })
 
+const PORT = process.env.PORT || 8080
 const socketio = require('socket.io')(http)
 
 socketio.on('connection', (userSocket)=> {
@@ -12,5 +13,5 @@ socketio.on('connection', (userSocket)=> {
     })
 })
 
-http.listen('8080')
+http.listen(PORT)
 
