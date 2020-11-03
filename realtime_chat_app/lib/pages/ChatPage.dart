@@ -41,6 +41,60 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
   }
 
+  Widget buildInputArea() {
+    return Container(
+      height: height * 0.1,
+      width: width,
+      child: Row(
+        children: <Widget>[
+          buildChatInput(),
+          buildSendButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget buildChatInput() {
+    return Container(
+      width: width * 0.7,
+      padding: const EdgeInsets.all(2.0),
+      margin: const EdgeInsets.only(left: 40.0),
+      child: TextField(
+        decoration: InputDecoration.collapsed(
+          hintText: 'Send a message...',
+        ),
+        controller: textController,
+      ),
+    );
+  }
+
+  Widget buildSendButton() {
+    return FloatingActionButton(
+      backgroundColor: Colors.deepPurple,
+      onPressed: () {
+        //Check if the textfield has text or not
+        if (textController.text.isNotEmpty) {
+          //Send the message as JSON data to send_message event
+          socketIO.sendMessage(
+              'send_message', json.encode({'message': textController.text}));
+          //Add the message to the list
+          this.setState(() => messages.add(textController.text));
+          textController.text = '';
+          //Scrolldown the list to show the latest message
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: 600),
+            curve: Curves.ease,
+          );
+        }
+      },
+      child: Icon(
+        Icons.send,
+        size: 30,
+      ),
+    );
+  }
+
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
@@ -51,7 +105,7 @@ class _ChatPageState extends State<ChatPage> {
         children: <Widget>[
           SizedBox(height: height * 0.1),
           buildMessageList(height, width, messages, scrollController),
-          // buildInputArea(),
+          buildInputArea(),
         ],
       )),
     );
